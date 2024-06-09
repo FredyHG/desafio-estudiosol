@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: desafio-studiosol
+
+score:
+  touch_down: 6
+  extra_touch_down: 1
+  extra_touch_down_max: 2
+  field_goal: 3
