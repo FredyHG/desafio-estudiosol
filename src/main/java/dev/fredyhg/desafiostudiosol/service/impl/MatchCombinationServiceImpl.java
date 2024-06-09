@@ -1,7 +1,8 @@
-package dev.fredyhg.desafiostudiosol.service;
+package dev.fredyhg.desafiostudiosol.service.impl;
 
 import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
 import dev.fredyhg.desafiostudiosol.response.VerifyResponse;
+import dev.fredyhg.desafiostudiosol.service.MatchCombinationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +11,9 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class VerifyService {
+public class MatchCombinationServiceImpl implements MatchCombinationService {
 
-    public VerifyResponse verify(VerifyRequest verifyRequest) {
+    public VerifyResponse verifyCombinations(VerifyRequest verifyRequest) {
         log.info("Init analyse at: {}", LocalDateTime.now());
 
 
@@ -37,6 +38,16 @@ public class VerifyService {
         return new VerifyResponse(teamTwoCombinations);
     }
 
+
+
+    public Set<List<String>> findCombinations(int targetScore) {
+        Set<List<String>> result = new HashSet<>();
+
+        findCombinationsHelper(targetScore, 0, new ArrayList<>(), result, false);
+
+        return result;
+    }
+
     private HashMap<String, Integer> getTeamsScore(String score) {
 
         String[] stringScores = score.split("x");
@@ -48,18 +59,14 @@ public class VerifyService {
         return scores;
     }
 
-    public static Set<List<String>> findCombinations(int targetScore) {
-        Set<List<String>> result = new HashSet<>();
-        findCombinationsHelper(targetScore, 0, new ArrayList<>(), result, false);
-        return result;
-    }
-
-    private static void findCombinationsHelper(int targetScore, int currentScore, List<String> currentCombination, Set<List<String>> result, boolean lastWasTouchdown) {
+    private void findCombinationsHelper(int targetScore, int currentScore, List<String> currentCombination, Set<List<String>> result, boolean lastWasTouchdown) {
         if (currentScore == targetScore) {
             // Ordena a combinação antes de adicionar ao conjunto para evitar duplicatas
             List<String> sortedCombination = new ArrayList<>(currentCombination);
+
             sortedCombination.sort(String::compareTo);
             result.add(sortedCombination);
+
             return;
         }
 
@@ -69,23 +76,28 @@ public class VerifyService {
 
         // Tenta adicionar um touchdown
         currentCombination.add("Touchdown");
+
         findCombinationsHelper(targetScore, currentScore + 6, currentCombination, result, true);
         currentCombination.remove(currentCombination.size() - 1);
 
         // Tenta adicionar um ponto extra (se o último foi um touchdown)
         if (lastWasTouchdown) {
+
             currentCombination.add("Extra Point");
+
             findCombinationsHelper(targetScore, currentScore + 1, currentCombination, result, false);
             currentCombination.remove(currentCombination.size() - 1);
 
             // Tenta adicionar uma conversão de dois pontos (se o último foi um touchdown)
             currentCombination.add("Extra Two Points");
+
             findCombinationsHelper(targetScore, currentScore + 2, currentCombination, result, false);
             currentCombination.remove(currentCombination.size() - 1);
         }
 
         // Tenta adicionar um field goal
         currentCombination.add("Field Goal");
+
         findCombinationsHelper(targetScore, currentScore + 3, currentCombination, result, false);
         currentCombination.remove(currentCombination.size() - 1);
     }
