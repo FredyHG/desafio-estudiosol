@@ -1,9 +1,11 @@
 package dev.fredyhg.desafiostudiosol.service.impl;
 
+import dev.fredyhg.desafiostudiosol.exception.SameCombinationsException;
 import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
 import dev.fredyhg.desafiostudiosol.response.VerifyResponse;
-import dev.fredyhg.desafiostudiosol.service.MatchCombinationService;
+import dev.fredyhg.desafiostudiosol.service.ScoreCombinationService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,7 +13,19 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class MatchCombinationServiceImpl implements MatchCombinationService {
+public class ScoreCombinationServiceImpl implements ScoreCombinationService {
+
+    @Value("${score.touch_down}")
+    private Integer TOUCH_DOWN;
+
+    @Value("${score.extra_touch_down}")
+    private Integer EXTRA_TOUCH_DOWN;
+
+    @Value("${score.touch_down}")
+    private Integer EXTRA_TOUCH_DOWN_MAX;
+
+    @Value("${score.field_goal}")
+    private Integer FIELD_GOAL;
 
     public VerifyResponse verifyCombinations(VerifyRequest verifyRequest) {
         log.info("Init analyse at: {}", LocalDateTime.now());
@@ -29,6 +43,10 @@ public class MatchCombinationServiceImpl implements MatchCombinationService {
             return new VerifyResponse(0);
         }
 
+        if(teamOneCombinations == teamTwoCombinations) {
+            throw new SameCombinationsException("The both teams has a same score combination");
+        }
+
         if(teamOneCombinations > teamTwoCombinations) {
             log.info("First team is greater than second team");
             return new VerifyResponse(teamOneCombinations);
@@ -42,8 +60,9 @@ public class MatchCombinationServiceImpl implements MatchCombinationService {
 
     public Set<List<String>> findCombinations(int targetScore) {
         Set<List<String>> result = new HashSet<>();
+        List<String> currentCombination = new ArrayList<>();
 
-        findCombinationsHelper(targetScore, 0, new ArrayList<>(), result, false);
+        findCombinationsHelper(targetScore, 0, currentCombination, result, false);
 
         return result;
     }
@@ -59,7 +78,12 @@ public class MatchCombinationServiceImpl implements MatchCombinationService {
         return scores;
     }
 
-    private void findCombinationsHelper(int targetScore, int currentScore, List<String> currentCombination, Set<List<String>> result, boolean lastWasTouchdown) {
+    private void findCombinationsHelper(int targetScore,
+                                        int currentScore,
+                                        List<String> currentCombination,
+                                        Set<List<String>> result,
+                                        boolean lastWasTouchdown) {
+
         if (currentScore == targetScore) {
             // Ordena a combinação antes de adicionar ao conjunto para evitar duplicatas
             List<String> sortedCombination = new ArrayList<>(currentCombination);
@@ -77,7 +101,7 @@ public class MatchCombinationServiceImpl implements MatchCombinationService {
         // Tenta adicionar um touchdown
         currentCombination.add("Touchdown");
 
-        findCombinationsHelper(targetScore, currentScore + 6, currentCombination, result, true);
+        findCombinationsHelper(targetScore, currentScore + TOUCH_DOWN, currentCombination, result, true);
         currentCombination.remove(currentCombination.size() - 1);
 
         // Tenta adicionar um ponto extra (se o último foi um touchdown)
@@ -85,20 +109,20 @@ public class MatchCombinationServiceImpl implements MatchCombinationService {
 
             currentCombination.add("Extra Point");
 
-            findCombinationsHelper(targetScore, currentScore + 1, currentCombination, result, false);
+            findCombinationsHelper(targetScore, currentScore + EXTRA_TOUCH_DOWN, currentCombination, result, false);
             currentCombination.remove(currentCombination.size() - 1);
 
             // Tenta adicionar uma conversão de dois pontos (se o último foi um touchdown)
             currentCombination.add("Extra Two Points");
 
-            findCombinationsHelper(targetScore, currentScore + 2, currentCombination, result, false);
+            findCombinationsHelper(targetScore, currentScore + EXTRA_TOUCH_DOWN_MAX, currentCombination, result, false);
             currentCombination.remove(currentCombination.size() - 1);
         }
 
         // Tenta adicionar um field goal
         currentCombination.add("Field Goal");
 
-        findCombinationsHelper(targetScore, currentScore + 3, currentCombination, result, false);
+        findCombinationsHelper(targetScore, currentScore + FIELD_GOAL, currentCombination, result, false);
         currentCombination.remove(currentCombination.size() - 1);
     }
 }
