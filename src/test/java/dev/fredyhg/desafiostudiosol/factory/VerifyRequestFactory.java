@@ -1,6 +1,6 @@
 package dev.fredyhg.desafiostudiosol.factory;
 
-import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
+import dev.fredyhg.desafiostudiosol.controller.request.VerifyRequest;
 
 public class VerifyRequestFactory {
     public static VerifyRequest createValidVerifyRequest() {

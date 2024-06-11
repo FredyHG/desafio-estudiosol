@@ -1,4 +1,4 @@
-package dev.fredyhg.desafiostudiosol.response;
+package dev.fredyhg.desafiostudiosol.controller.response;
 
 import lombok.Builder;
 import lombok.Data;
