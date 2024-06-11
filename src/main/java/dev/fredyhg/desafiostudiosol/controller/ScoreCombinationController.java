@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface ScoreCombinationController {
 
-    @Operation(summary = "Verify score combinations")
+    @Operation(summary = "Verify score combinations", tags = "Verify Combinations")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success to verify combinations"),
-            @ApiResponse(responseCode = "301", description = "The both teams has a same combinations possible score")
+            @ApiResponse(responseCode = "400", description = "The both teams has a same combinations possible score")
     })
     ResponseEntity<VerifyResponse> verify(VerifyRequest verifyRequest);
 }
