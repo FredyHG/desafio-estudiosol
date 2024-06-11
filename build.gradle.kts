@@ -34,7 +34,6 @@ dependencies {
 
     //Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.wiremock:wiremock:3.6.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     //Other
