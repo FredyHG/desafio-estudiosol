@@ -1,11 +1,12 @@
 package dev.fredyhg.desafiostudiosol.service.impl;
 
 import dev.fredyhg.desafiostudiosol.exception.SameCombinationsException;
+import dev.fredyhg.desafiostudiosol.properties.ScoreProperties;
 import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
 import dev.fredyhg.desafiostudiosol.response.VerifyResponse;
 import dev.fredyhg.desafiostudiosol.service.ScoreCombinationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,25 +14,16 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ScoreCombinationServiceImpl implements ScoreCombinationService {
 
-    @Value("${score.touch_down}")
-    private Integer TOUCH_DOWN;
-
-    @Value("${score.extra_touch_down}")
-    private Integer EXTRA_TOUCH_DOWN;
-
-    @Value("${score.touch_down}")
-    private Integer EXTRA_TOUCH_DOWN_MAX;
-
-    @Value("${score.field_goal}")
-    private Integer FIELD_GOAL;
+    private final ScoreProperties scoreProperties;
 
     public VerifyResponse verifyCombinations(VerifyRequest verifyRequest) {
         log.info("Init analyse at: {}", LocalDateTime.now());
 
 
-        HashMap<String, Integer> teamsScore = getTeamsScore(verifyRequest.getScore());
+        HashMap<String, Integer> teamsScore = getTeamsScore(verifyRequest.score());
 
         Integer teamOneScore = teamsScore.get("teamOne");
         Integer teamTwoScore = teamsScore.get("teamTwo");
@@ -101,7 +93,7 @@ public class ScoreCombinationServiceImpl implements ScoreCombinationService {
         // Tenta adicionar um touchdown
         currentCombination.add("Touchdown");
 
-        findCombinationsHelper(targetScore, currentScore + TOUCH_DOWN, currentCombination, result, true);
+        findCombinationsHelper(targetScore, currentScore + scoreProperties.getTouchDown(), currentCombination, result, true);
         currentCombination.remove(currentCombination.size() - 1);
 
         // Tenta adicionar um ponto extra (se o último foi um touchdown)
@@ -109,20 +101,20 @@ public class ScoreCombinationServiceImpl implements ScoreCombinationService {
 
             currentCombination.add("Extra Point");
 
-            findCombinationsHelper(targetScore, currentScore + EXTRA_TOUCH_DOWN, currentCombination, result, false);
+            findCombinationsHelper(targetScore, currentScore + scoreProperties.getExtraTouchDown(), currentCombination, result, false);
             currentCombination.remove(currentCombination.size() - 1);
 
             // Tenta adicionar uma conversão de dois pontos (se o último foi um touchdown)
             currentCombination.add("Extra Two Points");
 
-            findCombinationsHelper(targetScore, currentScore + EXTRA_TOUCH_DOWN_MAX, currentCombination, result, false);
+            findCombinationsHelper(targetScore, currentScore + scoreProperties.getExtraTouchDownMax(), currentCombination, result, false);
             currentCombination.remove(currentCombination.size() - 1);
         }
 
         // Tenta adicionar um field goal
         currentCombination.add("Field Goal");
 
-        findCombinationsHelper(targetScore, currentScore + FIELD_GOAL, currentCombination, result, false);
+        findCombinationsHelper(targetScore, currentScore + scoreProperties.getFieldGoal(), currentCombination, result, false);
         currentCombination.remove(currentCombination.size() - 1);
     }
 }
