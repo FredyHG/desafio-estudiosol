@@ -1,8 +1,8 @@
 package dev.fredyhg.desafiostudiosol.controller.impl;
 
 import dev.fredyhg.desafiostudiosol.controller.ScoreCombinationController;
-import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
-import dev.fredyhg.desafiostudiosol.response.VerifyResponse;
+import dev.fredyhg.desafiostudiosol.controller.request.VerifyRequest;
+import dev.fredyhg.desafiostudiosol.controller.response.VerifyResponse;
 import dev.fredyhg.desafiostudiosol.service.ScoreCombinationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

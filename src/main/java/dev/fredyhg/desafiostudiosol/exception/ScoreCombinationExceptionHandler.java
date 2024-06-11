@@ -1,8 +1,7 @@
 package dev.fredyhg.desafiostudiosol.exception;
 
-import dev.fredyhg.desafiostudiosol.response.ResponseMessage;
+import dev.fredyhg.desafiostudiosol.controller.response.ResponseMessage;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,10 +13,15 @@ import java.time.LocalDateTime;
 public class ScoreCombinationExceptionHandler {
 
     @ExceptionHandler(SameCombinationsException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
     public ResponseMessage sameResult(Exception ex, WebRequest request) {
-        return createErrorMessage(ex, request, HttpStatus.BAD_REQUEST);
+        return createErrorMessage(ex, request, HttpStatus.CONFLICT);
+    }
 
+    @ExceptionHandler(InvalidScoreFormatException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseMessage invalidScoreFormat(Exception ex, WebRequest request) {
+        return createErrorMessage(ex, request, HttpStatus.BAD_REQUEST);
     }
 
     public ResponseMessage createErrorMessage(Exception ex, WebRequest request, HttpStatus httpStatus){

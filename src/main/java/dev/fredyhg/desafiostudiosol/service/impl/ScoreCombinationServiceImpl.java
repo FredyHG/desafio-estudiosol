@@ -1,9 +1,10 @@
 package dev.fredyhg.desafiostudiosol.service.impl;
 
+import dev.fredyhg.desafiostudiosol.exception.InvalidScoreFormatException;
 import dev.fredyhg.desafiostudiosol.exception.SameCombinationsException;
 import dev.fredyhg.desafiostudiosol.properties.ScoreProperties;
-import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
-import dev.fredyhg.desafiostudiosol.response.VerifyResponse;
+import dev.fredyhg.desafiostudiosol.controller.request.VerifyRequest;
+import dev.fredyhg.desafiostudiosol.controller.response.VerifyResponse;
 import dev.fredyhg.desafiostudiosol.service.ScoreCombinationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ public class ScoreCombinationServiceImpl implements ScoreCombinationService {
     public VerifyResponse verifyCombinations(VerifyRequest verifyRequest) {
         log.info("Init analyse at: {}", LocalDateTime.now());
 
-
         HashMap<String, Integer> teamsScore = getTeamsScore(verifyRequest.score());
 
         Integer teamOneScore = teamsScore.get("teamOne");
@@ -30,6 +30,8 @@ public class ScoreCombinationServiceImpl implements ScoreCombinationService {
 
         int teamOneCombinations = findCombinations(teamOneScore).size();
         int teamTwoCombinations = findCombinations(teamTwoScore).size();
+
+        log.info("Ending analyse at: {}", LocalDateTime.now());
 
         if(teamOneCombinations == 0 || teamTwoCombinations == 0) {
             return new VerifyResponse(0);
@@ -61,11 +63,16 @@ public class ScoreCombinationServiceImpl implements ScoreCombinationService {
 
     private HashMap<String, Integer> getTeamsScore(String score) {
 
-        String[] stringScores = score.split("x");
         HashMap<String, Integer> scores = new HashMap<>();
 
-        scores.put("teamOne", Integer.parseInt(stringScores[0]));
-        scores.put("teamTwo", Integer.parseInt(stringScores[1]));
+        try {
+            String[] stringScores = score.split("x");
+
+            scores.put("teamOne", Integer.parseInt(stringScores[0]));
+            scores.put("teamTwo", Integer.parseInt(stringScores[1]));
+        } catch (Exception e) {
+            throw new InvalidScoreFormatException("Invalid format of score: '" + score + "'. Expected format: 'teamOneScorexteamTwoScore' (e.g., '3x15').");
+        }
 
         return scores;
     }
