@@ -4,7 +4,6 @@ import dev.fredyhg.desafiostudiosol.controller.ScoreCombinationController;
 import dev.fredyhg.desafiostudiosol.request.VerifyRequest;
 import dev.fredyhg.desafiostudiosol.response.VerifyResponse;
 import dev.fredyhg.desafiostudiosol.service.ScoreCombinationService;
-import dev.fredyhg.desafiostudiosol.service.impl.ScoreCombinationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ public class ScoreCombinationControllerImpl implements ScoreCombinationControlle
     @PostMapping("/verify")
     @Override
     public ResponseEntity<VerifyResponse> verify(@RequestBody VerifyRequest verifyRequest) {
-        log.info("Receive score: {}", verifyRequest.getScore());
+        log.info("Receive score: {}", verifyRequest.score());
 
         return ResponseEntity.status(HttpStatus.OK).body(scoreCombinationService.verifyCombinations(verifyRequest));
     }
