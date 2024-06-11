@@ -43,10 +43,18 @@ public class ScoreCombinationControllerIntegrationTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenScoresAreEqual() throws Exception {
+    void shouldReturnConflictWhenScoresAreEqual() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/verify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"score\":\"15x15\"}"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenScoresIsInvalidFormat() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/verify")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"score\":\"1515\"}"))
                 .andExpect(status().isBadRequest());
     }
 }
